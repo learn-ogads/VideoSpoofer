@@ -6,12 +6,9 @@ namespace VideoSpoofer.Services;
 
 public class FFmpegService
 {
-    private readonly string _executablePath;
 
-    public FFmpegService(string executablePath)
-    {
-        _executablePath = executablePath;
-    }
+    public static string GetExecutablePath() =>
+        Path.Join(Path.GetPathRoot(Environment.SystemDirectory), "ffmpeg", "bin", "ffmpeg.exe");
 
     /// <summary>
     /// CreateArguments will create the arguments for FFMpeg and create the directories required
@@ -34,7 +31,7 @@ public class FFmpegService
         {
             CreateNoWindow = false,
             UseShellExecute = false,
-            FileName = _executablePath,
+            FileName = GetExecutablePath(),
             Arguments = arguments,
             WindowStyle = ProcessWindowStyle.Hidden,
             RedirectStandardOutput = true

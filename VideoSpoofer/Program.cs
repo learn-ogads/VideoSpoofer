@@ -7,10 +7,9 @@ AnsiConsole.Write(
         .LeftJustified()
         .Color(Color.Gold1));
 
-var ffmpegExec = "C:\\ffmpeg\\bin\\ffmpeg.exe";
+var ffmpegDownload = new FFmpegDownloadService();
+await ffmpegDownload.InstallAsync();
 
-AnsiConsole.MarkupLine("[red]Make sure you have ffmpeg installed in the following directory[/]");
-AnsiConsole.MarkupLine($"[yellow]{ffmpegExec}[/]");
 AnsiConsole.MarkupLine("[red3_1]This program only works on Windows[/]");
 
 // Get the video path
@@ -37,7 +36,7 @@ for (var i = 0; i < videoCount; i++)
         VideoPath = videoPath,
         ImagePath = Path.Join(Directory.GetCurrentDirectory(), "bg.jpg")
     };
-    var ffmpeg = new FFmpegService(ffmpegExec);
+    var ffmpeg = new FFmpegService();
     await ffmpeg.CreateVideoAsync(details);
 }
 
