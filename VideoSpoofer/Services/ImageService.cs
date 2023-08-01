@@ -13,7 +13,7 @@ public class ImageService
 
     public async Task GetImageAsync()
     {
-        AnsiConsole.MarkupLine("[green]Getting image from Pixabay[/]");
+        AnsiConsole.MarkupLine("[green]Getting image...[/]");
         try
         {
             // var stream = await _httpClient.GetStreamAsync("https://random.imagecdn.app/1080/1920");
