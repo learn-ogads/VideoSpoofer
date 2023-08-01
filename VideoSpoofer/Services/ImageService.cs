@@ -16,7 +16,8 @@ public class ImageService
         AnsiConsole.MarkupLine("[green]Getting image from Pixabay[/]");
         try
         {
-            var stream = await _httpClient.GetStreamAsync("https://random.imagecdn.app/1080/1920");
+            // var stream = await _httpClient.GetStreamAsync("https://random.imagecdn.app/1080/1920");
+            var stream = await _httpClient.GetStreamAsync("https://source.unsplash.com/random/1080x1920?sig=");
             var filePath = Path.Join(Directory.GetCurrentDirectory(), "bg.jpg");
             AnsiConsole.MarkupLine($"[green]Downloaded image to: {filePath}[/]");
             await using var fs = File.Create(filePath);
