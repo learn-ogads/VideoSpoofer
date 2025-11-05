@@ -1,5 +1,4 @@
-﻿using System.IO.Compression;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using Spectre.Console;
@@ -81,24 +80,26 @@ public class FFmpegDownloadService
         Environment.Exit(1);
         return drive;
     }
-    
+
     /// <summary>
     /// InstallAsync will download/install FFmpeg if it doesn't exist.
     /// Currently this is a Windows only feature
     /// </summary>
-    public async Task InstallAsync()
+    public async Task<bool> InstallAsync()
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return;
+            return false;
         if (Exists())
         {
             AnsiConsole.MarkupLine("[yellow]FFmpeg exists![/]");
-            return;
+            return true;
         }
         
         var zipStream = await DownloadAsync();
         var rootFolder = Extract7Zip(zipStream);
         ChangeFolderName(rootFolder);
+
+        return true;
     }
 
     private static void ChangeFolderName(string rootFolder)

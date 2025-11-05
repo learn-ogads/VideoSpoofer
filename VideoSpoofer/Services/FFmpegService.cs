@@ -19,12 +19,16 @@ public class FFmpegService
         var outputPath = Path.Join(Directory.GetCurrentDirectory(), "output", $"{Guid.NewGuid()}.mp4");
         return $"-i \"{videoDetails.VideoPath}\" " +
                $"-i \"{videoDetails.ImagePath}\" " +
-               "-filter_complex \"[0]crop=900:1600:70:0[vid];[1][vid]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2\" " +
+               "-filter_complex \"[0:v]scale=720:1280:force_original_aspect_ratio=decrease[v];[1:v]scale=1080:1920[bg];[bg][v]overlay=(W-w)/2:(H-h)/2\" " +
                "-c:a copy " +
                $"\"{outputPath}\"";
     }
     
-    public async Task CreateVideoAsync(VideoDetails videoDetails)
+    /// <summary>
+    /// Will create a video using ffmpeg.
+    /// This expects the video to have the dimensions of 1080x1920.
+    /// </summary>
+    public static async Task<bool> CreateVideoAsync(VideoDetails videoDetails)
     {
         var arguments = CreateArguments(videoDetails);
         var startInfo = new ProcessStartInfo
@@ -37,27 +41,35 @@ public class FFmpegService
             RedirectStandardOutput = true
         };
 
-        try
+        /**
+         * Start the process
+         */
+        using var process = Process.Start(startInfo);
+
+        /**
+         * If the process is null, return false.
+         * This means ffmpeg failed to start
+         */
+        if (process == null)
         {
-            AnsiConsole.MarkupLine("[green]Creating video...[/]");
-            using var process = Process.Start(startInfo);
-            if (process == null)
-            {
-                AnsiConsole.MarkupLine("[red]Failed to start ffmpeg... Closing[/]");
-                Environment.Exit(1);
-            }
-            while (!process.StandardOutput.EndOfStream)
-            {
-                var line = await process.StandardOutput.ReadLineAsync();
-                if (line != null)
-                    Console.WriteLine(line.Trim());
-            }
-            await process.WaitForExitAsync();
-            AnsiConsole.MarkupLine("[green]Finished creating video[/]");
+            return false;
         }
-        catch (Exception ex)
+
+        /**
+         * Read the standard output until the end of the stream.
+         * Once we reach the end, output the message
+         */
+        while (!process.StandardOutput.EndOfStream)
         {
-            AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
+            var line = await process.StandardOutput.ReadLineAsync();
+            if (line != null)
+                Console.WriteLine(line.Trim());
         }
+        
+        /**
+         * Wait for ffmpeg to close
+         */
+        await process.WaitForExitAsync();
+        return true;
     }
 }
